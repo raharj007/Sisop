@@ -8,12 +8,10 @@ typedef struct {
 }prima;
 
 void *run1(void* prim) {
-	int hasil;	
 	prima *numb=(prima*)prim;
-	if(numb->i==2 || numb->i==3 || numb->i==5 || numb->i==7){
-		(numb->flag)++;	
+	if(numb->i==2 || numb->i==3 || numb->i==5 || numb->i==7 || numb->i==11){
+		(numb->flag)=(numb->flag)+2;	
 	}
-	printf("thread 1: %d\n",numb->flag);	
 }
 
 void *run2(void* prim) {
@@ -23,7 +21,6 @@ void *run2(void* prim) {
 	if(hasil!=0){
 		(numb->flag)++;	
 	}
-	printf("thread 2: %d\n",numb->flag);
 }
 
 void *run3(void* prim) {
@@ -33,7 +30,6 @@ void *run3(void* prim) {
 	if(hasil!=0){
 		(numb->flag)++;	
 	}
-	printf("thread 3: %d\n",numb->flag);
 }
 
 void *run4(void* prim) {
@@ -43,7 +39,6 @@ void *run4(void* prim) {
 	if(hasil!=0){
 		(numb->flag)++;	
 	}
-	printf("thread 4: %d\n",numb->flag);
 }
 
 void *run5(void* prim) {
@@ -53,12 +48,19 @@ void *run5(void* prim) {
 	if(hasil!=0){
 		(numb->flag)++;	
 	}
-	printf("thread 5: %d\n",numb->flag);
 }
-/*
+
 void *run6(void* prim) {
-	
-}*/
+	int hasil, j;
+	prima *numb=(prima*)prim;
+	for(j=11;j<numb->i;j++){
+		hasil=numb->i%j;
+		if(hasil==0) break;
+	}
+	if(hasil!=0){
+		(numb->flag)++;	
+	}
+}
 
 int no2(){
 	prima prim;
@@ -74,15 +76,14 @@ int no2(){
 		pthread_create(&prim3, NULL, run3, &prim);
 		pthread_create(&prim5, NULL, run4, &prim);
 		pthread_create(&prim7, NULL, run5, &prim);
-		//pthread_create(&primsel, NULL, run6, (void*)prim);
+		pthread_create(&primsel, NULL, run6, &prim);
 		pthread_join(prim1, NULL);
 		pthread_join(prim2, NULL);
 		pthread_join(prim3, NULL);
 		pthread_join(prim5, NULL);
 		pthread_join(prim7, NULL);
-		//pthread_join(&primsel, NULL);
-		printf("jumlah flag= %d\n",prim.flag);
-		if(prim.flag>=4){
+		pthread_join(primsel, NULL);
+		if(prim.flag>=5){
 			printf("%d\n",prim.i);		
 		}
 		prim.flag=0;
@@ -96,9 +97,9 @@ int main(){
 	scanf("%d", &pilih);
 	
 	switch(pilih){
-		case 1 : no2();
-		case 2 : no2();
-		case 3 : no2();
+		case 1 : no2(); break;
+		case 2 : no2(); break;
+		case 3 : no2(); break;
 	}
 	return 0;
 }

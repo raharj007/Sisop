@@ -7,6 +7,44 @@ typedef struct {
 	int flag;
 }prima;
 
+typedef struct{
+	FILE *file, *file1, *file2;
+	char buff[100];
+	char buff2[100];
+}strak;
+
+void *first(void* file) {
+	strak *nyalin=(strak*)file;
+	nyalin->file = fopen("/home/black00/Sisop/test.txt", "r");
+	fscanf(nyalin->file, "%[^\n]", nyalin->buff);
+	nyalin->file1 = fopen("/home/black00/Sisop/test1.txt", "w+");
+	fprintf(nyalin->file1, "%s\n", nyalin->buff);
+	fclose(nyalin->file);
+	fclose(nyalin->file1);
+}
+
+void *second(void *file){
+	strak *nyalin=(strak*)file;
+	nyalin->file1 = fopen("/home/black00/Sisop/test1.txt", "r");
+	fscanf(nyalin->file1, "%[^\n]", nyalin->buff2);
+	nyalin->file2 = fopen("/home/black00/Sisop/test2.txt", "w+");
+	fprintf(nyalin->file2, "%s\n", nyalin->buff2);
+	fclose(nyalin->file1);
+	fclose(nyalin->file2);
+}
+
+int no3(){
+	strak file;	
+	pthread_t salin1, salin2;
+	pthread_create(&salin1, NULL, first, &file);
+	pthread_create(&salin2, NULL, second, &file);
+	
+	pthread_join(salin1, NULL);
+	pthread_join(salin2, NULL);
+	
+	return 0;
+}
+
 void *run1(void* prim) {
 	prima *numb=(prima*)prim;
 	if(numb->i==2 || numb->i==3 || numb->i==5 || numb->i==7 || numb->i==11){
@@ -99,7 +137,7 @@ int main(){
 	switch(pilih){
 		case 1 : no2(); break;
 		case 2 : no2(); break;
-		case 3 : no2(); break;
+		case 3 : no3(); break;
 	}
 	return 0;
 }

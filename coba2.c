@@ -3,8 +3,16 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <errno.h>
 #define PANJANG 1024
 #define AKHIRAN " \t\r\n"
+
+void working(){
+	char *buff, *scan;
+	buff = (char *)malloc(sizeof(char)*PANJANG);
+	if((scan = getcwd(buff, PANJANG))!=NULL)
+		printf("%s", scan);
+}
 
 void cd(char *line, char *nulis)
 {
@@ -34,40 +42,37 @@ void cd(char *line, char *nulis)
 void univ(char *line, char *nulis)
 {
 	int i=0;
-	char *args[20], *cek, *fix;
-	while(nulis!=NULL){
-		args[i]=nulis;
-		nulis=strtok(NULL, AKHIRAN);		
-		i++;
-	}
-	/*cek=strstr(args[0], "&");
-	printf("%s\n", cek);
-	if(strcmp(cek, "&")==0){
-		fix=strtok(args[0], "&");
-		printf("%s\n", fix);
-	}*/
-	args[i] = NULL; 	
-	execvp(args[0], args);
-}
-
-void mandek(int signum){
+	char *args[20], *cek;
 	pid_t pid;
 	pid=fork();
 	if(pid>0){
 		wait();
 	}
-	else{	
+	else{
+		while(nulis!=NULL){
+			args[i]=nulis;
+			nulis=strtok(NULL, AKHIRAN);		
+			i++;
+		}
+		args[i] = NULL; 	
+		execvp(args[0], args);
 	}
 }
 
+void nothing(int signum){
+}
+
 int main(){
-	char *nulis;
+	char *nulis, *fix;
 	char line[PANJANG];
-	signal(SIGINT, mandek);
+	signal(SIGINT, nothing);
+	signal(SIGSTOP, SIG_IGN);
+	pid_t pid;
 	while(1){
-		printf("Terminal@Tirtonadi $ ");
-		//getchar();
-		if(!fgets(line, PANJANG, stdin)) break;
+		printf("E20@Terminal ~");
+		working();
+		printf(" $ ");
+		if(!fgets(line, PANJANG, stdin)) break;		
 		if((nulis = strtok(line, AKHIRAN))){
 			if(strcmp(nulis, "exit") == 0){
 				exit(0);	
@@ -76,14 +81,21 @@ int main(){
 				cd(nulis, line);			
 			}
 			else{
-				pid_t pid;
-				pid=fork();
-				if(pid==0){	
-					univ(nulis, line);
-				}
-				else{
-					wait();
-				}
+				//char *cek=strstr(nulis, "&");
+				//if(cek==NULL){printf("ok\n");				
+				//	pid=fork();
+				//	if(pid==0){	
+				univ(nulis, line);
+				//	}
+				//	else{
+				//		wait();
+				//	}
+				//}printf("1.%s\n", cek);
+				/*if(strcmp(cek, "&")==0){
+					printf("%s\n", cek);
+					fix=strtok(nulis, "&");
+					univ(fix, line);			
+				}*/				
 			}	
 		}
 	}

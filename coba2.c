@@ -39,6 +39,16 @@ void cd(char *line, char *nulis)
 	}
 }
 
+void background(char *line, char *nulis)
+{
+	int i=0;
+	char *args[2], *cek;
+	cek=strtok(nulis, "&");
+	args[0] = nulis;
+	args[1] = NULL; 	
+	execvp(args[0], args);
+}
+
 void univ(char *line, char *nulis)
 {
 	int i=0;
@@ -63,7 +73,8 @@ void nothing(int signum){
 }
 
 int main(){
-	char *nulis, *fix;
+	char *nulis;
+	char *fix;
 	char line[PANJANG];
 	signal(SIGINT, nothing);
 	signal(SIGSTOP, SIG_IGN);
@@ -81,21 +92,14 @@ int main(){
 				cd(nulis, line);			
 			}
 			else{
-				//char *cek=strstr(nulis, "&");
-				//if(cek==NULL){printf("ok\n");				
-				//	pid=fork();
-				//	if(pid==0){	
-				univ(nulis, line);
-				//	}
-				//	else{
-				//		wait();
-				//	}
-				//}printf("1.%s\n", cek);
-				/*if(strcmp(cek, "&")==0){
-					printf("%s\n", cek);
-					fix=strtok(nulis, "&");
-					univ(fix, line);			
-				}*/				
+				char *src=nulis+strlen(nulis)-1;				
+				strcpy(fix, src);				
+				if(strcmp(fix, "&")==0){
+					background(nulis, line);				
+				}
+				else{
+					univ(nulis, line);
+				}				
 			}	
 		}
 	}

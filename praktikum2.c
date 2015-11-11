@@ -1,48 +1,68 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <string.h>
 
 typedef struct {
 	int i;
 	int flag;
 }prima;
 
-typedef struct{
-	FILE *file, *file1, *file2;
-	char buff[100];
-	char buff2[100];
-}strak;
-
-void *first(void* file) {
-	strak *nyalin=(strak*)file;
-	nyalin->file = fopen("/home/black00/Sisop/test.txt", "r");
-	fscanf(nyalin->file, "%[^\n]", nyalin->buff);
-	nyalin->file1 = fopen("/home/black00/Sisop/test1.txt", "w+");
-	fprintf(nyalin->file1, "%s\n", nyalin->buff);
-	fclose(nyalin->file);
-	fclose(nyalin->file1);
+void *nyalin1(void *filename) {
+	FILE *file, *file1;
+	char line[101];
+	char **filename_ = (char **) filename;
+	file = fopen(filename_[0], "r");
+	file1 = fopen(filename_[1], "w+");
+	while (fgets(line, 100, file))
+    	{
+       		fprintf(file1, "%s", line);
+    	}
+	fclose(file);
+	fclose(file1);
 }
 
-void *second(void *file){
-	strak *nyalin=(strak*)file;
-	nyalin->file1 = fopen("/home/black00/Sisop/test1.txt", "r");
-	fscanf(nyalin->file1, "%[^\n]", nyalin->buff2);
-	nyalin->file2 = fopen("/home/black00/Sisop/test2.txt", "w+");
-	fprintf(nyalin->file2, "%s\n", nyalin->buff2);
-	fclose(nyalin->file1);
-	fclose(nyalin->file2);
+void *nyalin2(void *filename){
+	FILE *file1, *file2;
+	char line[101];
+	char **filename_ = (char **) filename;
+	file1 = fopen(filename_[1], "r");
+	file2 = fopen(filename_[2], "w+");
+	while (fgets(line, 100, file1))
+    	{
+       		fprintf(file2, "%s", line);
+    	}
+	fclose(file1);
+	fclose(file2);
 }
 
 int no3(){
-	strak file;	
-	pthread_t salin1, salin2;
-	pthread_create(&salin1, NULL, first, &file);
-	pthread_create(&salin2, NULL, second, &file);
+	pthread_t salin1, salin2;	
+	char **filename = (char **) malloc(sizeof(char*) * 3);
+	int i;
+	for(i=0; i<3; i++)
+	{
+		char a[10];
+		if(i==0) strcpy(a, "copy");
+		else if(i==1) strcpy(a, "temp");
+		else if(i==2) strcpy(a, "write");
+		printf("Masukkan nama file %s : ", a);
+        	filename[i] = (char *) malloc(sizeof(char)*101);
+        	scanf("%s", filename[i]);
+        	if (access(filename[i], F_OK) != 0)
+        	{
+            		printf("File can not be accessed!\n");
+            		exit(EXIT_FAILURE);
+        	}
+	}
+	pthread_create(&salin1, NULL, nyalin1, (void *)filename);
+	pthread_create(&salin2, NULL, nyalin2, (void *)filename);
 	
 	pthread_join(salin1, NULL);
 	pthread_join(salin2, NULL);
 	
-	return 0;
+	free(filename);
 }
 
 void *run1(void* prim) {
@@ -106,7 +126,8 @@ int no2(){
 	prim.flag=0;
 	int n;
 	pthread_t prim1, prim2, prim3, prim5, prim7, primsel;
-
+	
+	printf("Masukkan jumlah n: \n");
 	scanf("%d", &n);
 	for(prim.i=2;prim.i<=n;prim.i++){	
 		pthread_create(&prim1, NULL, run1, &prim);
@@ -131,13 +152,15 @@ int no2(){
 
 int main(){
 	int pilih;
-	printf("Pilih soal nomor [1, 2, 3]: \n");
-	scanf("%d", &pilih);
+	pilih=1;
+	while(pilih!=0){
+		printf("Pilih soal nomor [2 / 3]: \n");
+		scanf("%d", &pilih);
 	
-	switch(pilih){
-		case 1 : no2(); break;
-		case 2 : no2(); break;
-		case 3 : no3(); break;
+		switch(pilih){
+			case 2 : no2(); break;
+			case 3 : no3(); break;
+		}
 	}
 	return 0;
 }

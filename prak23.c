@@ -62,6 +62,7 @@ int salinfile(){
             		printf("File can not be accessed!\n");
             		exit(EXIT_FAILURE);
         	}
+        	fflush(stdin);
 	}
 	pthread_create(&salin1, NULL, run, (void *)filename);
 	pthread_create(&salin2, NULL, run2, (void *)filename);
